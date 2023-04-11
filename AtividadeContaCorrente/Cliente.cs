@@ -9,17 +9,17 @@ namespace AtividadeContaCorrente
 {
     public class Cliente
     {
-        public string nome;
+        public static string nome;
         public string email;
+        public string senha;
         public int cpf;
-        public int id;
 
-        public Cliente (string nome, string email, int cpf, int id) 
+        public Cliente (string nome, string email, string senha, int cpf) 
         {
-            this.nome = nome;                
-            this.email = email;                
+            Cliente.nome = nome;                
+            this.email = email;   
+            this.senha = senha;
             this.cpf = cpf;
-            this.id = id;
         }
     }
 }

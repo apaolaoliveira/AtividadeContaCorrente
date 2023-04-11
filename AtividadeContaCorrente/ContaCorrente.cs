@@ -5,8 +5,19 @@ namespace AtividadeContaCorrente
 {
     public class ContaCorrente
     {
-        private int numeroDaConta;
-        private double saldo;
+        public static void MensagemColorida(string mensagem, ConsoleColor cor)
+        {
+            Console.ForegroundColor = cor;
+            Console.WriteLine(mensagem);
+            Console.ResetColor();
+        }
+
+        public Cliente Cliente { get; set; }
+
+        string nomeDoCliente = Cliente.nome;
+
+        private static int numeroDaConta = 00000;
+        private double saldo = 100;
         private bool contaEspecial;
         private double limite;
 
@@ -25,23 +36,21 @@ namespace AtividadeContaCorrente
 
         private ArrayList Movimentacoes = new ArrayList();
 
-        private static int contadorDeMovimentacoes;
-
         public ContaCorrente(Cliente cliente, int numeroDaConta, double saldo, bool contaEspecial) 
         {
             Cliente nomeCliente = cliente;
-            this.numeroDaConta = numeroDaConta;
+            ContaCorrente.numeroDaConta = numeroDaConta++;
             this.saldo = saldo;
             this.contaEspecial = contaEspecial;
         }
 
-        public bool Sacar(double valor, string tipo)
+        public bool Sacar(double valor, string tipo, bool exibirMensagem = true)
         {
             double limiteSaldo = limite + saldo;
 
             if (valor > limiteSaldo)
             {
-                Console.WriteLine("Saldo insuficiente para saque.");
+                MensagemColorida("Saldo insuficiente para saque.", ConsoleColor.Red);
                 return false;
             }
             else
@@ -49,45 +58,46 @@ namespace AtividadeContaCorrente
                 Movimentacao movimentacao = new Movimentacao(-valor, tipo);
                 Movimentacoes.Add(movimentacao);
                 saldo -= valor;
-                Console.WriteLine("Saque efetuado com sucesso!");
-                contadorDeMovimentacoes++;
+                if (exibirMensagem)
+                    MensagemColorida($"Saque de {valor.ToString("C2")} efetuado com sucesso!", ConsoleColor.Green);                
                 return true;
             }
         }
-        public void Depositar(double valor, string tipo)
+
+        public void Depositar(double valor, string tipo, bool exibirMensagem = true)
         {
             saldo += valor;
             Movimentacao movimentacao = new Movimentacao(valor, tipo);
             Movimentacoes.Add(movimentacao);
-            Console.WriteLine("Deposito efetuado com sucesso!");
-            contadorDeMovimentacoes++;
+            if (exibirMensagem)
+                MensagemColorida($"Deposito de {valor.ToString("C2")} efetuado com sucesso!", ConsoleColor.Green);           
         }
 
         public bool Transferir(ContaCorrente destino, double valor, string tipo)
-        {
+        { 
             if (saldo < valor)
             {
-                Console.WriteLine("Saldo insuficiente para transferência.");
+                MensagemColorida("Saldo insuficiente para transferência.", ConsoleColor.Red);
                 return false;
             }
             else
             {
-                Sacar(valor, tipo);
-                destino.Depositar(valor, tipo);
-                Console.WriteLine($"Transferência efetuada com sucesso! \n Valor transferido: {valor}");
-                contadorDeMovimentacoes++;
+                Sacar(valor, tipo, false);
+                destino.Depositar(valor, tipo, false);
+                MensagemColorida($"\nTransferência efetuada com sucesso!", ConsoleColor.Green);
+                MensagemColorida($"\nCliente {nomeDoCliente} tranferiu {valor.ToString("C2")} para {destino.nomeDoCliente}.", ConsoleColor.Blue);                
                 return true;
             }
         }
 
-        public void ObterExtrato()
+        public void ExibirExtrato()
         {
+            Console.WriteLine($"\nExtrato de {nomeDoCliente}\n");
 
             foreach (Movimentacao movimentacao in Movimentacoes)
             {
-                Console.WriteLine($"Movimentação número {contadorDeMovimentacoes}");
-                Console.WriteLine($"Valor: {movimentacao.valor}");
-                Console.WriteLine($"Tipo: {movimentacao.tipo}");
+                MensagemColorida($"Valor: {movimentacao.valor}", ConsoleColor.Cyan);
+                MensagemColorida($"Tipo: {movimentacao.tipo}", ConsoleColor.Cyan);
             }
         }
     }
